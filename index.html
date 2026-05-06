@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>📝 写メ日記ジェネレーター PRO</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --pink: #d1508a;
+      --pink-light: #f7c5df;
+      --purple: #9b59b6;
+      --grad: linear-gradient(135deg, #e879b8, #c75fa0, #9b5fc7);
+      --bg: linear-gradient(160deg, #fff0f8 0%, #f3eaff 100%);
+    }
+
+    body {
+      font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      padding: 14px 14px 40px;
+      color: #444;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 1.25rem;
+      color: var(--pink);
+      margin-bottom: 2px;
+      letter-spacing: 0.05em;
+    }
+    .subtitle { text-align: center; font-size: 0.75rem; color: #bbb; margin-bottom: 18px; }
+
+    /* カード */
+    .card {
+      background: white;
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 14px rgba(180,80,140,0.10);
+    }
+
+    .sec-title {
+      font-size: 0.8rem;
+      font-weight: bold;
+      color: var(--pink);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* チップ */
+    .chips { display: flex; flex-wrap: wrap; gap: 7px; }
+    .chip {
+      padding: 6px 13px;
+      border-radius: 20px;
+      border: 1.5px solid #e8c0d8;
+      background: white;
+      font-size: 0.8rem;
+      cursor: pointer;
+      color: var(--pink);
+      transition: all 0.15s;
+      user-select: none;
+    }
+    .chip.sel {
+      background: var(--grad);
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 2px 8px rgba(200,80,160,0.3);
+    }
+
+    /* キャラカード */
+    .chara-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .chara-card {
+      border-radius: 14px;
+      border: 1.5px solid #e8c0d8;
+      background: white;
+      padding: 10px 6px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s;
+      user-select: none;
+    }
+    .chara-card .icon { font-size: 1.6rem; }
+    .chara-card .name { font-size: 0.72rem; font-weight: bold; color: var(--pink); margin-top: 4px; }
+    .chara-card .desc { font-size: 0.65rem; color: #bbb; margin-top: 2px; }
+    .chara-card.sel {
+      background: linear-gradient(135deg, #fde8f4, #ecdeff);
+      border-color: var(--pink);
+      box-shadow: 0 2px 10px rgba(200,80,160,0.2);
+    }
+
+    /* 天気 */
+    .weather-row { display: flex; gap: 6px; }
+    .wbtn {
+      flex: 1;
+      padding: 9px 2px;
+      border-radius: 13px;
+      border: 1.5px solid #e8c0d8;
+      background: white;
+      font-size: 1.3rem;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      transition: all 0.15s;
+    }
+    .wbtn .wl { font-size: 0.63rem; color: #bbb; }
+    .wbtn.sel { background: linear-gradient(135deg,#ffd6f0,#e8c0f8); border-color: var(--pink); }
+
+    /* テキスト */
+    textarea, input[type=text] {
+      width: 100%;
+      border: 1.5px solid #e8c0d8;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 0.88rem;
+      font-family: inherit;
+      color: #444;
+      outline: none;
+      transition: border-color 0.2s;
+      resize: none;
+      background: #fdf8fc;
+    }
+    textarea:focus, input[type=text]:focus { border-color: var(--pink); background: white; }
+
+    /* タグヒント */
+    .tag-hints { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .tag-hint {
+      padding: 4px 10px;
+      border-radius: 12px;
+      background: #fdf0fa;
+      border: 1px solid #e8c0d8;
+      font-size: 0.73rem;
+      color: var(--pink);
+      cursor: pointer;
+    }
+    .tag-hint:active { background: #f0d8ec; }
+
+    /* スライダー */
+    .slider-row { display: flex; align-items: center; gap: 8px; }
+    input[type=range] { flex: 1; accent-color: var(--pink); }
+    .slider-lbl { font-size: 0.78rem; color: var(--pink); font-weight: bold; min-width: 36px; text-align: right; }
+
+    /* 生成数 */
+    .count-row { display: flex; gap: 8px; }
+    .count-btn {
+      flex: 1;
+      padding: 9px;
+      border-radius: 12px;
+      border: 1.5px solid #e8c0d8;
+      background: white;
+      font-size: 0.82rem;
+      color: var(--pink);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+    }
+    .count-btn.sel { background: var(--grad); color: white; border-color: transparent; }
+
+    /* ボタン */
+    .gen-btn {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 24px;
+      background: var(--grad);
+      color: white;
+      font-size: 1.05rem;
+      font-weight: bold;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      box-shadow: 0 4px 18px rgba(200,80,160,0.35);
+      transition: transform 0.12s, box-shadow 0.12s;
+      margin-bottom: 14px;
+    }
+    .gen-btn:active { transform: scale(0.97); box-shadow: 0 2px 8px rgba(200,80,160,0.25); }
+
+    /* 結果 */
+    .results-wrap { display: none; }
+    .results-wrap.vis { display: block; }
+
+    .result-item {
+      background: white;
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 14px rgba(180,80,140,0.10);
+    }
+    .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .result-num { font-size: 0.78rem; font-weight: bold; color: var(--pink); }
+    .result-style-tag {
+      font-size: 0.68rem;
+      padding: 2px 9px;
+      border-radius: 10px;
+      background: linear-gradient(135deg,#fde8f4,#ecdeff);
+      color: var(--pink);
+    }
+    .copy-btn {
+      padding: 5px 14px;
+      border-radius: 18px;
+      border: 1.5px solid var(--pink);
+      background: white;
+      color: var(--pink);
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .copy-btn.done { background: var(--pink); color: white; }
+
+    .result-text {
+      font-size: 0.88rem;
+      line-height: 1.9;
+      color: #444;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    .char-count { text-align: right; font-size: 0.7rem; color: #ccc; margin-top: 6px; }
+
+    .regen-btn {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 20px;
+      border: 1.5px solid #e8c0d8;
+      background: white;
+      color: var(--pink);
+      font-size: 0.86rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .regen-btn:active { background: #fdf0fa; }
+
+    /* 区切り */
+    hr { border: none; border-top: 1px dashed #f0d0e8; margin: 4px 0 10px; }
+  </style>
+</head>
+<body>
+
+<h1>✨ 写メ日記ジェネレーター PRO</h1>
+<p class="subtitle">キャラ設定＆バリエーション豊富な強化版</p>
+
+<!-- キャラ設定 -->
+<div class="card">
+  <div class="sec-title">🎭 キャラ設定（文体が変わるよ）</div>
+  <div class="chara-grid" id="charaGroup">
+    <div class="chara-card sel" data-val="natural">
+      <div class="icon">🌸</div>
+      <div class="name">ナチュラル</div>
+      <div class="desc">自然体・等身大</div>
+    </div>
+    <div class="chara-card" data-val="gyaru">
+      <div class="icon">💅</div>
+      <div class="name">ギャル系</div>
+      <div class="desc">元気・テンション高め</div>
+    </div>
+    <div class="chara-card" data-val="ojosama">
+      <div class="icon">👑</div>
+      <div class="name">お嬢様系</div>
+      <div class="desc">上品・丁寧語</div>
+    </div>
+    <div class="chara-card" data-val="tenten">
+      <div class="icon">🐣</div>
+      <div class="name">天然系</div>
+      <div class="desc">ふわふわ・のんびり</div>
+    </div>
+    <div class="chara-card" data-val="cool">
+      <div class="icon">🖤</div>
+      <div class="name">クール系</div>
+      <div class="desc">さらっと・おしゃれ</div>
+    </div>
+    <div class="chara-card" data-val="ane">
+      <div class="icon">🔥</div>
+      <div class="name">姉御系</div>
+      <div class="desc">頼れる・さばさば</div>
+    </div>
+  </div>
+</div>
+
+<!-- 気分 -->
+<div class="card">
+  <div class="sec-title">💕 今の気分</div>
+  <div class="chips" id="moodGroup">
+    <div class="chip" data-val="happy">嬉しい</div>
+    <div class="chip" data-val="fuwafuwa">ふわふわ</div>
+    <div class="chip" data-val="tension">テンション高め</div>
+    <div class="chip" data-val="mattari">まったり</div>
+    <div class="chip" data-val="nemui">眠い</div>
+    <div class="chip" data-val="dokidoki">ドキドキ</div>
+    <div class="chip" data-val="relax">リラックス</div>
+    <div class="chip" data-val="amaetai">甘えたい</div>
+    <div class="chip" data-val="yaruki">やる気満々</div>
+    <div class="chip" data-val="setsunai">切ない</div>
+    <div class="chip" data-val="noろma">のんびり</div>
+    <div class="chip" data-val="curious">好奇心旺盛</div>
+  </div>
+</div>
+
+<!-- 天気 -->
+<div class="card">
+  <div class="sec-title">🌤 今日の天気</div>
+  <div class="weather-row" id="weatherGroup">
+    <button class="wbtn" data-val="sunny">☀️<span class="wl">晴れ</span></button>
+    <button class="wbtn" data-val="cloudy">☁️<span class="wl">くもり</span></button>
+    <button class="wbtn" data-val="rainy">🌧️<span class="wl">雨</span></button>
+    <button class="wbtn" data-val="snowy">❄️<span class="wl">雪</span></button>
+    <button class="wbtn" data-val="mixed">🌦️<span class="wl">変わりやすい</span></button>
+  </div>
+</div>
+
+<!-- 季節 -->
+<div class="card">
+  <div class="sec-title">🍂 季節感</div>
+  <div class="chips" id="seasonGroup">
+    <div class="chip" data-val="spring">🌸 春</div>
+    <div class="chip" data-val="summer">☀️ 夏</div>
+    <div class="chip" data-val="autumn">🍁 秋</div>
+    <div class="chip" data-val="winter">❄️ 冬</div>
+    <div class="chip" data-val="none">季節感なし</div>
+  </div>
+</div>
+
+<!-- 話題 -->
+<div class="card">
+  <div class="sec-title">📌 話題・出来事</div>
+  <textarea id="topicInput" rows="3" placeholder="例）カフェでランチした、ネイルを変えた、映画を見た…"></textarea>
+  <div class="tag-hints" id="tagHints">
+    <span class="tag-hint">🍰 スイーツ</span>
+    <span class="tag-hint">💅 ネイル</span>
+    <span class="tag-hint">🛍️ お買い物</span>
+    <span class="tag-hint">🎵 音楽</span>
+    <span class="tag-hint">🐱 動物</span>
+    <span class="tag-hint">📺 ドラマ</span>
+    <span class="tag-hint">🏃 運動</span>
+    <span class="tag-hint">💄 メイク</span>
+    <span class="tag-hint">☕ カフェ</span>
+    <span class="tag-hint">🍜 グルメ</span>
+    <span class="tag-hint">📚 読書</span>
+    <span class="tag-hint">🎮 ゲーム</span>
+    <span class="tag-hint">🌿 散歩</span>
+    <span class="tag-hint">🎨 アート</span>
+    <span class="tag-hint">🍺 飲み</span>
+    <span class="tag-hint">💆 マッサージ</span>
+    <span class="tag-hint">🎤 カラオケ</span>
+    <span class="tag-hint">🌙 夜更かし</span>
+  </div>
+</div>
+
+<!-- メッセージ -->
+<div class="card">
+  <div class="sec-title">💌 お客様へひとこと（任意）</div>
+  <input type="text" id="messageInput" placeholder="例）会いに来てね、一緒に過ごしたいな…">
+</div>
+
+<!-- オプション -->
+<div class="card">
+  <div class="sec-title">⚙️ 生成オプション</div>
+
+  <div style="margin-bottom:12px">
+    <div style="font-size:0.78rem;color:#aaa;margin-bottom:7px">📏 文章の長さ</div>
+    <div class="slider-row">
+      <span style="font-size:0.75rem;color:#bbb">短め</span>
+      <input type="range" id="lengthSlider" min="1" max="3" value="2" step="1">
+      <span style="font-size:0.75rem;color:#bbb">長め</span>
+      <span class="slider-lbl" id="lengthLabel">普通</span>
+    </div>
+  </div>
+
+  <hr>
+
+  <div>
+    <div style="font-size:0.78rem;color:#aaa;margin-bottom:7px">🔢 同時に生成する数</div>
+    <div class="count-row" id="countGroup">
+      <div class="count-btn sel" data-val="1">1パターン</div>
+      <div class="count-btn" data-val="3">3パターン</div>
+      <div class="count-btn" data-val="5">5パターン</div>
+    </div>
+  </div>
+</div>
+
+<!-- 生成ボタン -->
+<button class="gen-btn" id="generateBtn">✨ 日記を生成する ✨</button>
+
+<!-- 結果 -->
+<div class="results-wrap" id="resultsWrap"></div>
+
+<script>
+// ============================================================
+// フレーズDB
+// ============================================================
+const DB = {
+  // ---- 書き出し ----
+  openings: {
+    natural: {
+      happy:    ['今日はなんかすごく嬉しい一日だったよ', '朝から気分がよくて、それだけでいい日になった'],
+      fuwafuwa: ['なんかふわふわした気分が続いてる', 'ほわほわした気持ちで一日過ごしてた'],
+      tension:  ['今日はめちゃくちゃテンション高くて！', '朝から謎にアドレナリン出てる笑'],
+      mattari:  ['今日はのんびりまったりした一日で', 'ゆっくりした時間が流れてた一日だったよ'],
+      nemui:    ['なんか今日はすごく眠くて…笑', 'うとうとしながら過ごした一日'],
+      dokidoki: ['なんかドキドキが止まらない一日で！', '胸がときめく出来事があった今日'],
+      relax:    ['今日はとってもリラックスできた', '心がふーってなる感じの一日だった'],
+      amaetai:  ['なんか今日は誰かに甘えたい気分で', 'ちょっとだけ甘えんぼモードな今日'],
+      yaruki:   ['今日はめちゃくちゃやる気スイッチオンで！', '朝から全力で頑張れた一日だったよ'],
+      setsunai: ['なんかちょっと切ない気持ちになった今日', 'ちょっぴりセンチメンタルな一日で'],
+      noろま:   ['今日はのんびりのんびり過ごした', 'なんかゆるゆると流れていった一日で'],
+      curious:  ['今日はいろんなことが気になって仕方なかった！', '好奇心のまま動いた一日だったな'],
+    },
+    gyaru: {
+      happy:    ['今日やばい、めっちゃ嬉しいことあったんだけど！！', 'きょーはほんとサイコーな一日だったんだけど笑'],
+      fuwafuwa: ['なんかきょーふわっふわした気分なんですけど〜', 'ふわ〜ってなる感じずっと続いてる笑'],
+      tension:  ['きょーのテンションやばくない！？笑', 'ちょーハイになってる日なんだけどww'],
+      mattari:  ['きょーはまじでまったりした〜！', 'ゆるっゆるで過ごした一日だった笑'],
+      nemui:    ['眠すぎてやばい今日笑', 'まじで眠眠打破が必要な一日だった笑'],
+      dokidoki: ['きょーなんかドキドキしっぱなしで！！', 'ときめいた！！ほんとにときめいた！！笑'],
+      relax:    ['きょーはまじリラックスできた〜！', 'ほんとにゆっくりできた最高な一日'],
+      amaetai:  ['なんか今日あまえたい気分マックスなんだけど笑', '誰かにぐりぐりしたい気分なんですけど笑'],
+      yaruki:   ['きょーはまじでやる気えぐくて！', 'テンション爆上がりで一日過ごした笑'],
+      setsunai: ['なんかちょっとせつなくなっちゃった今日', 'ちょっとだけセンチな気持ちになった'],
+      noろま:   ['きょーはだら〜っとしてた笑', 'ゆっるく過ごしたきょー笑'],
+      curious:  ['きょーはいろんなことが気になりすぎてやばかった！', '好奇心旺盛すぎる一日だったww'],
+    },
+    ojosama: {
+      happy:    ['本日はとても嬉しいことがございました', '朝からお心が浮き立つような一日でしてよ'],
+      fuwafuwa: ['なんとなくふわふわとした心地で過ごしておりました', '夢の中にいるような一日でしたわ'],
+      tension:  ['本日はいつにも増して活力があふれておりましたの', '気持ちが上向きで、とても充実した一日でしてよ'],
+      mattari:  ['今日はのんびりとした穏やかな時間を過ごしましたわ', 'ゆったりと流れる時間が心地よかったですわ'],
+      nemui:    ['本日は少し眠気が抜けない一日でしてよ', 'うとうとしながら過ごした一日でしたわ'],
+      dokidoki: ['今日は胸が弾むような出来事がありましたの', 'ドキドキが止まらない、素敵な一日でしてよ'],
+      relax:    ['本日はとても穏やかにリラックスできましたわ', '心が安らぐ一日でしたの'],
+      amaetai:  ['なんとなく誰かに甘えたいような気持ちになりましたわ', '今日はちょっぴり甘えんぼさんですの'],
+      yaruki:   ['本日はことのほかやる気が漲っておりました', 'エネルギーが溢れて止まらない一日でしてよ'],
+      setsunai: ['今日は少しセンチメンタルな気持ちになりましたの', 'ちょっぴり切ない気持ちが漂う一日でしたわ'],
+      noろま:   ['ゆっくりのんびりと過ごした一日でしたわ', '穏やかに流れるような時間でしたの'],
+      curious:  ['本日はいろいろなことに興味が湧いて仕方ありませんでしたわ', '好奇心がくすぐられる一日でしてよ'],
+    },
+    tenten: {
+      happy:    ['きょーなんか嬉しいことがあった気がする〜！', 'ほわほわ〜って幸せな気分の一日だったよ〜'],
+      fuwafuwa: ['なんかずーっとふわふわしてた〜笑', 'ふわっとした気持ちが続いてた〜'],
+      tension:  ['なんか今日テンション高かった〜！なんでかわからないけど笑', 'ふしぎとテンションが高い一日だったよ〜'],
+      mattari:  ['きょーはまったりのんびりしてた〜', 'ゆるゆる〜っとした一日だったよ'],
+      nemui:    ['きょーはずーっと眠かった…なんでだろ笑', 'うとうとしながら過ごしてた〜笑'],
+      dokidoki: ['なんか今日ドキドキしてた〜なんでだろ笑', '胸がどきどきする出来事があったよ〜！'],
+      relax:    ['きょーはのんびりリラックスできた〜', 'ゆっくりできてほわほわ幸せな一日だったよ〜'],
+      amaetai:  ['なんか今日は甘えたい気分〜笑', 'ふにゃ〜ってなってる感じ笑'],
+      yaruki:   ['きょーはやる気が出てたよ〜！なんかすごい！笑', 'なぜかやる気スイッチ入ってた〜'],
+      setsunai: ['なんかちょっとせつない気持ちになっちゃった〜', 'なんかふっとさみしいような気持ちになった'],
+      noろま:   ['きょーはのんびりのんびりしてた〜', 'ゆっくりした時間が流れてたよ〜'],
+      curious:  ['きょーはいろんなことが気になって気になって！', 'なんかいろんなことを調べてた〜笑'],
+    },
+    cool: {
+      happy:    ['今日はちょっと嬉しいことがあった', '珍しくテンションが上がった一日'],
+      fuwafuwa: ['なんとなくふわっとした気分が続いてた', '不思議と穏やかな気持ちでいられた一日'],
+      tension:  ['今日は珍しくテンション高めだった', '気分がよくて、いつもより動けた一日'],
+      mattari:  ['今日はひたすらまったり過ごした', 'ゆっくりとした時間を大切にした一日'],
+      nemui:    ['なぜか眠気が取れない一日だった', 'ちょっと眠かったけど、それもそれで悪くない'],
+      dokidoki: ['珍しく胸がどきっとした瞬間があった', 'ちょっとときめいた、そんな一日'],
+      relax:    ['今日は丁寧に自分の時間を使えた', 'ゆっくり、深く呼吸できた一日だった'],
+      amaetai:  ['なんか甘えたい気分になってる、珍しく', 'ちょっとだけ誰かに寄りかかりたいな、今日'],
+      yaruki:   ['今日は珍しくエンジンがかかった', 'やる気が出た。それだけで十分いい日'],
+      setsunai: ['なんとなく切ない気持ちが漂う一日', '少しだけ、センチな気分'],
+      noろま:   ['今日はのんびり過ごすと決めてた', 'ゆっくりと、ただそれだけの一日'],
+      curious:  ['今日はいろいろ気になることがあって、調べてた', '好奇心が動いた一日。それはそれで楽しい'],
+    },
+    ane: {
+      happy:    ['今日はさ、なかなかいい一日だったんだよね', 'ちょっと嬉しいことがあってさ、いい気分'],
+      fuwafuwa: ['なんかふわっとした気分が続いてる、不思議と', 'ほんわかした気持ちで過ごした一日'],
+      tension:  ['今日はなんかスイッチ入ってたわ！', '珍しくテンション高かった笑 気分よかった'],
+      mattari:  ['今日はあえてゆっくりした、それが正解だと思う', 'まったり過ごす日も必要だよな'],
+      nemui:    ['なんか今日眠くてさ笑、まあいいか', '眠気が取れなかったけど、そんな日もある'],
+      dokidoki: ['今日はちょっとドキドキしたな、久々に', 'なんかときめいた、悪くない気分だった笑'],
+      relax:    ['今日はしっかりリラックスできた', 'ちゃんと休めた。それが大事'],
+      amaetai:  ['珍しく甘えたい気分になってる笑', 'なんか今日は誰かに頼りたいな笑'],
+      yaruki:   ['今日はバリバリやれた一日', 'やる気出た日は全力でやる、それだけ'],
+      setsunai: ['なんかちょっとしみじみした気持ちになった', 'たまにせつなくなる夜もある'],
+      noろま:   ['今日はゆっくり過ごした、これが一番', 'のんびりした日は充電できる'],
+      curious:  ['今日はいろんなことが気になってしょうがなかった笑', '好奇心が止まらない、なんかワクワクしてた'],
+    },
+  },
+
+  // ---- 天気フレーズ ----
+  weather: {
+    sunny: {
+      natural: ['お天気もよくて気持ちいい一日だったよ♪', '青空がきれいで、なんか深呼吸したくなった'],
+      gyaru:   ['晴れてて最高だった〜！テンション上がる', 'お天気がよくてそれだけで気分アゲだった笑'],
+      ojosama: ['晴天に恵まれて、とても清々しい一日でしたわ', '青空が美しく、心が軽くなりましたの'],
+      tenten:  ['晴れてて嬉しかった〜！', 'お天気がよくてほわほわ気分になったよ'],
+      cool:    ['晴れてた。それだけで十分いい朝だった', '天気がよかった、気分も上がった'],
+      ane:     ['晴れてたから気分よかった', 'いい天気で、なんかやる気出た笑'],
+    },
+    cloudy: {
+      natural: ['曇り空だったけど、それもなんか落ち着く感じで', 'くもりの日って独特の雰囲気があって好きかも'],
+      gyaru:   ['曇りだったけど全然関係ない笑 気分は晴れ！', 'くもりくもりって感じだったけど元気だったよ笑'],
+      ojosama: ['今日は曇り空でしたが、それはそれで趣がありましたわ', '柔らかな光が漂う、落ち着いた一日でしたの'],
+      tenten:  ['くもってたけどそれはそれでいい感じだった〜', '曇り空もなんか好きかも〜'],
+      cool:    ['曇りだった。でも悪くない', '灰色の空もたまにはいい'],
+      ane:     ['曇りだったけど別に問題ない笑', 'くもり空もなんか好きなんだよね'],
+    },
+    rainy: {
+      natural: ['雨の日ってなんか好きで、雨音が心地よくて', '雨だったんだけど、それがまたいい感じで'],
+      gyaru:   ['雨だったけどそれがまたエモくて！笑', '雨でも全然テンション下がらなかった笑'],
+      ojosama: ['今日は雨でしたが、雨音がなんとも心地よくて', 'しとしとと降る雨が、かえって情緒を感じさせましたわ'],
+      tenten:  ['雨だったよ〜、でもなんか雨の音好き〜', '雨が降ってたんだけどそれがまたいい感じで〜'],
+      cool:    ['雨だった。雨の日も嫌いじゃない', '雨音が静かで、集中できた'],
+      ane:     ['雨か〜、まあ嫌いじゃないけどね笑', '雨の日ってなんか落ち着くんだよね'],
+    },
+    snowy: {
+      natural: ['雪が降ってて、なんかテンション上がった！', '雪景色ってきれいだよね、久々に見た気がした'],
+      gyaru:   ['雪だ〜！！テンション爆上がりした笑', '雪ふってた！！きゃーってなった笑'],
+      ojosama: ['雪が舞い降りて、とても風情のある一日でしたわ', '白銀の景色が美しく、うっとりいたしましたの'],
+      tenten:  ['雪が降ってた〜！すごいなーってずっと見てた笑', 'ゆきー！ふわふわで可愛かった〜'],
+      cool:    ['雪が降ってた。白くて静かで、嫌いじゃない', '雪。なんか気持ちが澄んだ'],
+      ane:     ['雪降ってた、それはそれでテンション上がるな笑', '雪か〜、久々だ。悪くない'],
+    },
+    mixed: {
+      natural: ['天気がころころ変わる一日だったな', '晴れたり雨が降ったり忙しい空模様で'],
+      gyaru:   ['天気がころころしてて笑 服装悩んだわ', '晴れたり雨降ったりで忙しかった笑'],
+      ojosama: ['今日はお天気がめまぐるしく変わりましたわね', '変わりやすい空模様の中、なんとか過ごせましたの'],
+      tenten:  ['天気が変わりやすい一日だったよ〜', '晴れてたのに急に雨降ってきてびっくりした〜'],
+      cool:    ['天気が読めない一日だった', '空がころころ変わってた'],
+      ane:     ['天気が不安定だったな', '晴れたり雨降ったり、まあそういう日もある'],
+    },
+  },
+
+  // ---- 季節フレーズ ----
+  seasons: {
+    spring: {
+      natural: ['桜がきれいな季節で、なんか心がほわっとする', '春の空気ってやさしくて好きだな'],
+      gyaru:   ['春って感じがしてテンション上がる〜！', '桜とかめちゃくちゃかわいい季節だよね笑'],
+      ojosama: ['春の訪れを感じる季節になりましたわね', '桜の季節は心が弾みますの'],
+      tenten:  ['春っぽい空気がしてほわほわした〜', 'なんか春の匂いがする〜好きだな〜'],
+      cool:    ['春の空気は柔らかくて悪くない', '桜の季節。好きだ、正直に言うと'],
+      ane:     ['春だな〜、なんか気持ちが明るくなる', '桜の季節っていいよな'],
+    },
+    summer: {
+      natural: ['夏の日差しが強くて、でも元気が出る感じで', 'なんか夏ってエネルギー全開になる気がする'],
+      gyaru:   ['夏が来た！！テンション最高潮！！', '暑いけどそれも含めて夏って感じで好き笑'],
+      ojosama: ['暑い季節になりましたが、夏の活気が好きですわ', '夏の日差しがまぶしくて、清々しい気持ちになりますの'],
+      tenten:  ['夏だ〜！暑いけどなんか楽しい〜', 'ひまわりとかかき氷とか夏って感じするよね〜'],
+      cool:    ['暑いのは苦手だが、夏の夜は好き', '夏。強い太陽が眩しい'],
+      ane:     ['夏！好きよ夏、テンション上がるよな', '暑いけど夏は元気が出る気がする'],
+    },
+    autumn: {
+      natural: ['秋の空気が心地よくて、なんかしみじみした', '食欲の秋ってほんとにそうだよな〜笑'],
+      gyaru:   ['秋っぽくなってきて服装考えるのが楽しい！', 'ハロウィンとかそういうの大好きな季節！'],
+      ojosama: ['秋の静けさが心を落ち着かせてくれますわ', '実りの秋、豊かな季節ですわね'],
+      tenten:  ['秋の風がひんやりして気持ちいい〜', '落ち葉がきれいだな〜ってしみじみした'],
+      cool:    ['秋。この季節が一番好きかもしれない', '涼しくなってきた。悪くない'],
+      ane:     ['秋になったな〜、これが一番過ごしやすい', '秋の空気って澄んでていいよな'],
+    },
+    winter: {
+      natural: ['冬って寒いけど、なんか好きな雰囲気があって', 'ホットドリンクが美味しい季節になってきた'],
+      gyaru:   ['冬きた！！コートおしゃれしたい季節！！', '寒いけどクリスマスとかあるし楽しみ笑'],
+      ojosama: ['冬の凛とした空気が好きですわ', '寒い季節ですが、温かいものが恋しくなりますのね'],
+      tenten:  ['冬だー！寒いけどなんか好き〜', 'ホットミルクとか美味しい季節だよね〜'],
+      cool:    ['冬は好きだ。空気が澄んでいる', '寒い。でも静かで、悪くない'],
+      ane:     ['冬だな〜、寒いけど嫌いじゃない', '鍋食べたくなる季節になったな笑'],
+    },
+    none: { natural:[], gyaru:[], ojosama:[], tenten:[], cool:[], ane:[] },
+  },
+
+  // ---- 話題テンプレ ----
+  topics: {
+    natural: [
+      '今日はね、{topic}したんだ♡',
+      '{topic}してみたんだけど、思ってたよりずっとよかったよ',
+      'ちょっと気になってた{topic}をやってみた！',
+      '{topic}したんだけどさ、なんか楽しかった',
+      '久々に{topic}してみて、やっぱり好きだなって思った',
+    ],
+    gyaru: [
+      'ていうかさ、今日{topic}したんだけど！！',
+      '{topic}したんだけどまじでよかった笑',
+      'ついに{topic}したんだけど最高すぎた！！',
+      '{topic}してみたらまじでテンション爆上がりした笑',
+      'きょーは{topic}したよ！うれし〜！',
+    ],
+    ojosama: [
+      '今日は{topic}いたしましたの',
+      '{topic}してみましたが、とても素敵でしたわ',
+      'ずっと気になっておりました{topic}をようやく楽しみましたの',
+      '{topic}いたしまして、とても充実した時間でしたわ',
+      'ひさしぶりに{topic}いたしました。やはりよいものですわね',
+    ],
+    tenten: [
+      '{topic}してみたよ〜！',
+      'きょーは{topic}したんだ〜、楽しかった〜',
+      'なんか気になってた{topic}してみた〜笑',
+      '{topic}してみたら思ったより全然よかった〜',
+      'ふとした流れで{topic}することになったんだけど〜笑',
+    ],
+    cool: [
+      '今日は{topic}してみた',
+      '{topic}した。それだけで十分満足',
+      'ふと{topic}してみる気になった',
+      '{topic}してみたら、思ったより悪くなかった',
+      '{topic}した日。こういう日は気分がいい',
+    ],
+    ane: [
+      'きょーは{topic}したんだよね',
+      '{topic}してきた、それがよかった',
+      '久々に{topic}してみた、やっぱいいな',
+      '{topic}してみたんだけど、なかなか気分よかった',
+      '{topic}した日は充実感ある笑',
+    ],
+  },
+
+  // ---- 追加フォロー文 ----
+  follows: {
+    natural: [
+      'こういう自分の時間ってすごく大切だなって改めて感じた',
+      '日常の中のちょっとした幸せって、こういうことだよね',
+      'なんか自分を大事にできた気がして、それだけで嬉しい',
+      'ちょっとしたことだけど、すごく満たされた気持ちになった',
+    ],
+    gyaru: [
+      'こういうのが毎日のエネルギー源だわ笑',
+      'たまにはこういう日も必要だよな〜！',
+      'こういう時間があるから毎日頑張れる笑',
+      '自分のこと大事にするって大切だよな〜って思った',
+    ],
+    ojosama: [
+      'こういった時間が日々の豊かさになりますのね',
+      '自分自身を大切にすることの大事さを改めて感じましたわ',
+      'ささやかでも幸せな時間というものはございますのね',
+      'こうした日常の一コマが、心を豊かにしてくれますの',
+    ],
+    tenten: [
+      'こういう時間って大事だよね〜ってしみじみ思った〜',
+      'なんかちょっとだけ自分を好きになれた気がした〜',
+      'しあわせってこういうところにあるんだな〜って感じた',
+      'ちょっとしたことで幸せになれるの、なんかいいな〜',
+    ],
+    cool: [
+      'こういう時間は必要だと思ってる',
+      '日常の中にある小さなよさ、ちゃんと感じてた',
+      '自分を大切にすることを忘れないようにしたい',
+      'ちょっとしたことが積み重なって、いい日になる',
+    ],
+    ane: [
+      'こういう時間が自分を作ってるんだと思う',
+      '自分のこと大切にするって、地味に大事だよな',
+      'こういうの積み重ねてくといい毎日になるよな',
+      'ちゃんと自分を満たした日は充実感が違う',
+    ],
+  },
+
+  // ---- 長め追加文 ----
+  extras: {
+    natural: [
+      'なんかこういうことって日記に書き留めておきたくなる',
+      '写メ日記って、自分の毎日をちゃんと残してる感じがして好き',
+      'あなたにも同じような幸せな時間があるといいなって思う',
+    ],
+    gyaru: [
+      'こういうの日記に書いておかないと絶対忘れるやつ笑',
+      '写メ日記書くの好き、自分の毎日が形になる感じがして',
+      'みんなにも話したくなるくらい嬉しかった笑',
+    ],
+    ojosama: [
+      'このような日常の一コマを大切に記しておきたいと思いましたの',
+      '写メ日記というものは、日々の輝きを形にしてくれますのね',
+      'あなたにもこのような素敵な瞬間がありますようにと願っておりますわ',
+    ],
+    tenten: [
+      'こういうの書いてるとなんか嬉しくなってくる〜笑',
+      '日記って書くと気持ちが整理されるよね〜',
+      'みんなにも話したいくらい嬉しかった〜！',
+    ],
+    cool: [
+      '記録しておきたくなるような一日だった',
+      '自分の毎日をちゃんと見ていたい。そう思う',
+      'こういう日は写真も撮っておきたくなる',
+    ],
+    ane: [
+      'こういう日はちゃんと記録しておきたくなるな',
+      '毎日ちゃんと生きてる証拠を残しておくのもいい',
+      'みんなも楽しい時間を大切にしてくれよな笑',
+    ],
+  },
+
+  // ---- エンディング ----
+  endings: {
+    natural: [
+      'また会いに来てね♡',
+      '一緒にいっぱいお話ししようね♪',
+      '会えるの楽しみにしてるよ♡',
+      'あなたのこと待ってるね♪',
+      'ゆっくりお話ししようね♡',
+      '遊びに来てくれたら嬉しいな♪',
+    ],
+    gyaru: [
+      'ぜったい来てよな！！笑 待ってるから！！',
+      '会いに来て〜！！絶対楽しくしてあげるよ笑',
+      'きてきて！一緒にはじけよ〜！！',
+      'まじで来てほしい笑 一緒に楽しもう！',
+    ],
+    ojosama: [
+      'いつでもお待ちしておりますわ♡',
+      'ぜひ会いにいらしてくださいませ♪',
+      'あなたのご来店を心よりお待ちしておりますわ',
+      '一緒に素敵な時間を過ごせたら嬉しいですの♡',
+    ],
+    tenten: [
+      'あそびにきてね〜！待ってるよ〜！',
+      'きてくれたら嬉しいな〜♡',
+      '会えたら嬉しい〜！待ってるね〜♪',
+      'ぜひきてね〜！一緒にいろいろ話したいな〜',
+    ],
+    cool: [
+      '来てほしい。それだけ',
+      '待ってる',
+      'いつでも、どうぞ',
+      '会いに来てくれたら、嬉しい',
+    ],
+    ane: [
+      '来い来い！待ってるぞ笑',
+      '遠慮しないで来てくれよな笑',
+      '来てくれたら全力で楽しくするから！',
+      '待ってるよ。本当に',
+    ],
+  },
+
+  // ---- 絵文字セット ----
+  emojiSets: {
+    natural: [['💕','✨','🌸','💗'],['🎀','💖','🌷','✨'],['💫','🌟','💝','🌸']],
+    gyaru:   [['🔥','💥','✨','🎉'],['😍','💯','🔥','✌️'],['🎊','💪','✨','🌟']],
+    ojosama: [['🌹','💎','✨','🌸'],['🎀','💐','🌷','✨'],['👑','💝','🌺','✨']],
+    tenten:  [['🐣','🌼','✨','💛'],['🍀','🌸','🐥','✨'],['🌈','🌟','💫','🌻']],
+    cool:    [['🖤','✨','🌙','💫'],['🌿','💎','🌑','✨'],['⭐','🌚','💫','🖤']],
+    ane:     [['🔥','💪','✨','🎯'],['👊','💥','✨','🌟'],['🏆','🔥','💫','⚡']],
+  },
+};
+
+// ============================================================
+// 状態
+// ============================================================
+let state = {
+  chara: 'natural',
+  mood: null,
+  weather: null,
+  season: null,
+  count: 1,
+};
+
+// ============================================================
+// ユーティリティ
+// ============================================================
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function pickOrNull(arr) { return arr.length ? pick(arr) : null; }
+
+// ============================================================
+// UI イベント
+// ============================================================
+document.querySelectorAll('#charaGroup .chara-card').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelectorAll('#charaGroup .chara-card').forEach(c => c.classList.remove('sel'));
+    el.classList.add('sel');
+    state.chara = el.dataset.val;
+  });
+});
+
+document.querySelectorAll('#moodGroup .chip').forEach(el => {
+  el.addEventListener('click', () => {
+    const wasSelected = el.classList.contains('sel');
+    document.querySelectorAll('#moodGroup .chip').forEach(c => c.classList.remove('sel'));
+    if (!wasSelected) { el.classList.add('sel'); state.mood = el.dataset.val; }
+    else state.mood = null;
+  });
+});
+
+document.querySelectorAll('#weatherGroup .wbtn').forEach(el => {
+  el.addEventListener('click', () => {
+    const wasSelected = el.classList.contains('sel');
+    document.querySelectorAll('#weatherGroup .wbtn').forEach(b => b.classList.remove('sel'));
+    if (!wasSelected) { el.classList.add('sel'); state.weather = el.dataset.val; }
+    else state.weather = null;
+  });
+});
+
+document.querySelectorAll('#seasonGroup .chip').forEach(el => {
+  el.addEventListener('click', () => {
+    const wasSelected = el.classList.contains('sel');
+    document.querySelectorAll('#seasonGroup .chip').forEach(c => c.classList.remove('sel'));
+    if (!wasSelected) { el.classList.add('sel'); state.season = el.dataset.val; }
+    else state.season = null;
+  });
+});
+
+document.querySelectorAll('#countGroup .count-btn').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelectorAll('#countGroup .count-btn').forEach(b => b.classList.remove('sel'));
+    el.classList.add('sel');
+    state.count = parseInt(el.dataset.val);
+  });
+});
+
+document.querySelectorAll('#tagHints .tag-hint').forEach(tag => {
+  tag.addEventListener('click', () => {
+    const ta = document.getElementById('topicInput');
+    const text = tag.textContent.replace(/^\S{1,2}\s?/, '').trim();
+    ta.value += (ta.value && !ta.value.match(/[、，,]$/) ? '、' : '') + text;
+  });
+});
+
+document.getElementById('lengthSlider').addEventListener('input', function() {
+  document.getElementById('lengthLabel').textContent = ['短め','普通','長め'][this.value-1];
+});
+
+document.getElementById('generateBtn').addEventListener('click', generateAll);
+
+// ============================================================
+// 生成
+// ============================================================
+function generateAll() {
+  const wrap = document.getElementById('resultsWrap');
+  wrap.innerHTML = '';
+  for (let i = 0; i < state.count; i++) {
+    const text = generateOne();
+    wrap.appendChild(makeResultItem(i + 1, text));
+  }
+  wrap.classList.add('vis');
+  wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function generateOne() {
+  const ch = state.chara;
+  const topic = document.getElementById('topicInput').value.trim();
+  const customMsg = document.getElementById('messageInput').value.trim();
+  const length = parseInt(document.getElementById('lengthSlider').value);
+  const emojis = pick(DB.emojiSets[ch]);
+  const [e1, e2, e3, e4] = emojis;
+
+  const parts = [];
+
+  // 1. 書き出し
+  let intro;
+  if (state.mood && DB.openings[ch][state.mood]) {
+    intro = pick(DB.openings[ch][state.mood]);
+  } else {
+    const fallback = {
+      natural: ['今日はいろいろあった一日だったよ', 'なんかあっという間に一日が過ぎてしまった'],
+      gyaru:   ['きょーもそれなりに充実してた笑', 'あっという間に一日終わった笑'],
+      ojosama: ['本日も充実した一日でしたわ', '今日もいい一日でしたの'],
+      tenten:  ['きょーもなんとなく過ぎていったよ〜', 'あっという間に一日終わったな〜'],
+      cool:    ['今日もいい一日だった', 'あっという間だったけど、悪くない一日'],
+      ane:     ['きょーもそこそこいい一日だった', '一日あっという間だったな'],
+    };
+    intro = pick(fallback[ch]);
+  }
+
+  // 天気
+  if (state.weather && DB.weather[state.weather] && DB.weather[state.weather][ch].length) {
+    intro += '。' + pick(DB.weather[state.weather][ch]);
+  }
+
+  parts.push(intro + e1);
+
+  // 2. 季節
+  if (state.season && state.season !== 'none' && DB.seasons[state.season][ch].length) {
+    parts.push(pick(DB.seasons[state.season][ch]) + e2);
+  }
+
+  // 3. 話題
+  if (topic) {
+    const tmpl = pick(DB.topics[ch]);
+    parts.push(tmpl.replace('{topic}', topic) + e3);
+
+    if (length >= 2) {
+      parts.push(pick(DB.follows[ch]) + e2);
+    }
+    if (length >= 3) {
+      parts.push(pick(DB.extras[ch]) + e4);
+    }
+  } else {
+    const noTopics = {
+      natural: ['特別なことはなかったけど、なんかほっこりした一日だったよ', '日常の中にある小さな幸せを感じた一日で'],
+      gyaru:   ['特になにもなかったけど、なんかいい一日だった笑', '毎日ってなんかドラマあるよな笑'],
+      ojosama: ['特別なことはございませんでしたが、穏やかな一日でしたわ', '平穏な日というのも、それはそれで幸せなものですのね'],
+      tenten:  ['特になにもなかったけど、なんかいい感じの一日だった〜', 'のんびりした一日もたまにはいいな〜'],
+      cool:    ['特に何もない日。それが一番好きかもしれない', 'なにもない日は、余白がある'],
+      ane:     ['特になにもなかったけど、それが一番充電できる日だな', '何もない日こそ大事にしたい'],
+    };
+    parts.push(pick(noTopics[ch]) + e4);
+
+    if (length >= 2) {
+      parts.push(pick(DB.follows[ch]) + e1);
+    }
+  }
+
+  // 4. カスタムメッセージ or エンディング
+  if (customMsg) {
+    parts.push(e2 + customMsg + e1);
+  } else if (length >= 2) {
+    parts.push(e2 + pick(DB.endings[ch]));
+  }
+
+  return parts.join('\n\n');
+}
+
+function makeResultItem(num, text) {
+  const charaNames = { natural:'ナチュラル', gyaru:'ギャル系', ojosama:'お嬢様系', tenten:'天然系', cool:'クール系', ane:'姉御系' };
+  const div = document.createElement('div');
+  div.className = 'result-item';
+  div.innerHTML = `
+    <div class="result-header">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="result-num">📝 パターン ${num}</span>
+        <span class="result-style-tag">${charaNames[state.chara]}</span>
+      </div>
+      <button class="copy-btn">📋 コピー</button>
+    </div>
+    <div class="result-text">${escHtml(text)}</div>
+    <div class="char-count">${text.length}文字</div>
+  `;
+  div.querySelector('.copy-btn').addEventListener('click', function() {
+    navigator.clipboard.writeText(text).then(() => {
+      this.textContent = '✅ コピー済み';
+      this.classList.add('done');
+      setTimeout(() => { this.textContent = '📋 コピー'; this.classList.remove('done'); }, 2000);
+    });
+  });
+  return div;
+}
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+</script>
+</body>
+</html>
