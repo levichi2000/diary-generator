@@ -351,6 +351,26 @@
     <span class="tag-hint">🎤 カラオケ</span>
     <span class="tag-hint">🌙 夜更かし</span>
   </div>
+  <!-- SMタグ -->
+  <div style="margin-top:10px;padding-top:10px;border-top:1px dashed #f0d0e8;">
+    <div style="font-size:0.72rem;color:#c75fa0;font-weight:bold;margin-bottom:6px;">🖤 SMワード</div>
+    <div class="tag-hints" id="smTagHints">
+      <span class="tag-hint">🖤 ドM</span>
+      <span class="tag-hint">🔗 縛り</span>
+      <span class="tag-hint">👋 叩かれたい</span>
+      <span class="tag-hint">⛓️ 拘束</span>
+      <span class="tag-hint">🍑 お尻</span>
+      <span class="tag-hint">😈 責められたい</span>
+      <span class="tag-hint">🕯️ 蝋燭</span>
+      <span class="tag-hint">👁️ 目隠し</span>
+      <span class="tag-hint">🤐 口枷</span>
+      <span class="tag-hint">💢 鞭</span>
+      <span class="tag-hint">🙏 命令されたい</span>
+      <span class="tag-hint">😳 羞恥</span>
+      <span class="tag-hint">🔒 拘束プレイ</span>
+      <span class="tag-hint">👠 踏まれたい</span>
+    </div>
+  </div>
 </div>
 
 <!-- メッセージ -->
@@ -611,6 +631,52 @@ const DB = {
     ],
   },
 
+  // ---- SMフレーズ ----
+  smPhrases: {
+    natural: [
+      'わたし、実はドMなんだよね…♡ {topic}とか、すごく気になってて',
+      '{topic}って、想像しただけでどきどきしちゃう♡',
+      '正直に言うと、{topic}に憧れてるんだ…♡ 受け入れてくれる人に会いたいな',
+      '{topic}されてみたい気持ちが止まらなくて…♡ こんな私はどう思う？',
+      'ちょっと恥ずかしいんだけど、{topic}ってすごく惹かれるものがあって♡',
+    ],
+    gyaru: [
+      '{topic}とか最高すぎるんだけど！！笑 まじでそういうの好きなんだよね',
+      'ぶっちゃけ{topic}されたくて仕方ないんだけど笑 誰かやってくれる人いない？',
+      '{topic}って聞くだけでドキドキするんですけど笑 やばくない？笑',
+      'わたし{topic}めっちゃ好きなんだよね〜！！エッチじゃん笑',
+      '{topic}とかもうたまんないやつじゃん笑 一緒に楽しんでくれる人求む！',
+    ],
+    ojosama: [
+      '{topic}というものに、ひそかに興味を抱いておりますの…♡',
+      'こっそり申し上げますと、{topic}にとても惹かれておりますわ…',
+      '{topic}、そっと受け入れてくださる方に出会いたいと思っておりますの♡',
+      '恥ずかしながら、{topic}がとても気になっておりますわ…♡',
+      '{topic}というものを、信頼できる方と体験してみたいと思っておりますの',
+    ],
+    tenten: [
+      '{topic}ってなんかドキドキするよね〜♡ わたしそういうの気になっちゃう笑',
+      'こっそり言うと{topic}に興味があるんだよね〜♡ 変かな？笑',
+      '{topic}ってすごいよね〜…想像しただけでふわふわしちゃった笑',
+      '{topic}されてみたいかもって思ってる〜♡ なんかドキドキ',
+      '{topic}って怖いけどなんか惹かれる〜♡ 不思議だよね笑',
+    ],
+    cool: [
+      '{topic}、興味がある。正直に言うと。',
+      '{topic}に惹かれてる自分がいる',
+      '{topic}、受け入れてくれる人を探してる',
+      '{topic}のこと、もっと知りたいと思ってる',
+      '{topic}。そういう自分を隠す気はない',
+    ],
+    ane: [
+      '{topic}好きなんだよね、隠す気ないけど笑',
+      '{topic}に興味ある人、一緒に楽しもうよ',
+      '{topic}されたい日ってあるんだよな笑 本音ね',
+      '{topic}、ちゃんと向き合ってくれる人と楽しみたい',
+      '{topic}って最高だと思う。わかる人にはわかるでしょ笑',
+    ],
+  },
+
   // ---- 追加フォロー文 ----
   follows: {
     natural: [
@@ -801,7 +867,7 @@ document.querySelectorAll('#countGroup .count-btn').forEach(el => {
   });
 });
 
-document.querySelectorAll('#tagHints .tag-hint').forEach(tag => {
+document.querySelectorAll('#tagHints .tag-hint, #smTagHints .tag-hint').forEach(tag => {
   tag.addEventListener('click', () => {
     const ta = document.getElementById('topicInput');
     const text = tag.textContent.replace(/^\S{1,2}\s?/, '').trim();
@@ -868,8 +934,11 @@ function generateOne() {
   }
 
   // 3. 話題
+  const smWords = ['ドm','ドM','縛り','叩かれ','拘束','お尻','責められ','蝋燭','目隠し','口枷','鞭','命令','羞恥','踏まれ','SM','sm','調教'];
+  const isSmTopic = topic && smWords.some(w => topic.includes(w));
+
   if (topic) {
-    const tmpl = pick(DB.topics[ch]);
+    const tmpl = isSmTopic ? pick(DB.smPhrases[ch]) : pick(DB.topics[ch]);
     parts.push(tmpl.replace('{topic}', topic) + e3);
 
     if (length >= 2) {
