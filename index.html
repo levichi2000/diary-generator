@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <title>📝 写メ日記ジェネレーター PRO</title>
+  <title>✨ 涼泉用写メ日記ジェネレーター PRO</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -240,12 +240,31 @@
 
     /* 区切り */
     hr { border: none; border-top: 1px dashed #f0d0e8; margin: 4px 0 10px; }
+
+    /* モード切替 */
+    .mode-toggle { display: flex; gap: 0; border-radius: 12px; overflow: hidden; border: 1.5px solid #e8c0d8; margin-bottom: 14px; }
+    .mode-btn {
+      flex: 1; padding: 10px 6px; text-align: center; font-size: 0.82rem; font-weight: bold;
+      cursor: pointer; background: white; color: #bbb; border: none; transition: all 0.2s;
+    }
+    .mode-btn.sel { background: var(--grad); color: white; }
+
+    /* お礼日記 */
+    .orei-label { font-size: 0.78rem; color: #aaa; margin-bottom: 6px; }
+    .orei-name { width:100%; padding:10px 12px; border-radius:10px; border:1.5px solid #e8c0d8; font-size:0.9rem; color:#444; margin-bottom:10px; }
+    .orei-name:focus { outline:none; border-color:var(--pink); }
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
 
-<h1>✨ 写メ日記ジェネレーター PRO</h1>
+<h1>✨ 涼泉用写メ日記ジェネレーター PRO</h1>
 <p class="subtitle">キャラ設定＆バリエーション豊富な強化版</p>
+
+<div class="mode-toggle" id="modeToggle">
+  <button class="mode-btn sel" data-mode="normal">📝 通常日記</button>
+  <button class="mode-btn" data-mode="orei">💌 お礼日記</button>
+</div>
 
 <!-- キャラ設定 -->
 <div class="card">
@@ -285,7 +304,7 @@
 </div>
 
 <!-- 気分 -->
-<div class="card">
+<div class="card normal-only">
   <div class="sec-title">💕 今の気分</div>
   <div class="chips" id="moodGroup">
     <div class="chip" data-val="semeraretai" style="border-color:#c060a0;color:#a0407a;">🖤 責められたい</div>
@@ -310,7 +329,7 @@
 </div>
 
 <!-- 天気 -->
-<div class="card">
+<div class="card normal-only">
   <div class="sec-title">🌤 今日の天気</div>
   <div class="weather-row" id="weatherGroup">
     <button class="wbtn" data-val="sunny">☀️<span class="wl">晴れ</span></button>
@@ -322,7 +341,7 @@
 </div>
 
 <!-- 季節 -->
-<div class="card">
+<div class="card normal-only">
   <div class="sec-title">🍂 季節感</div>
   <div class="chips" id="seasonGroup">
     <div class="chip" data-val="spring">🌸 春</div>
@@ -334,7 +353,7 @@
 </div>
 
 <!-- 話題 -->
-<div class="card">
+<div class="card normal-only">
   <div class="sec-title">📌 話題・出来事</div>
   <textarea id="topicInput" rows="3" placeholder="例）責められた、縛られた、カフェでランチ、ネイルを変えた…"></textarea>
   <!-- SMタグ（先頭） -->
@@ -380,7 +399,7 @@
 </div>
 
 <!-- メッセージ -->
-<div class="card">
+<div class="card normal-only">
   <div class="sec-title">💌 お客様へひとこと（任意）</div>
   <input type="text" id="messageInput" placeholder="例）会いに来てね、一緒に過ごしたいな…">
 </div>
@@ -408,6 +427,49 @@
       <div class="count-btn" data-val="3">3パターン</div>
       <div class="count-btn" data-val="5">5パターン</div>
     </div>
+  </div>
+</div>
+
+<!-- お礼日記専用入力 -->
+<div class="card hidden" id="oreiCard">
+  <div class="sec-title">💌 お礼日記の情報</div>
+
+  <div class="orei-label">👤 お客様のお名前・ハンドルネーム</div>
+  <input class="orei-name" id="oreiName" type="text" placeholder="例）田中さん、タナカくん、たなか様…">
+
+  <div class="orei-label" style="margin-top:4px">✨ お客様の印象・良かったところ（複数選択OK）</div>
+  <div class="chips" id="oreiImpression" style="margin-bottom:12px">
+    <div class="chip" data-val="yasashii">優しかった</div>
+    <div class="chip" data-val="hanashiyasui">話しやすかった</div>
+    <div class="chip" data-val="shinshi">紳士的だった</div>
+    <div class="chip" data-val="omoi">気遣いがすごかった</div>
+    <div class="chip" data-val="tanoshii">楽しかった</div>
+    <div class="chip" data-val="kakkoii">かっこよかった</div>
+    <div class="chip" data-val="iroiro">いろいろしてくれた</div>
+    <div class="chip" data-val="kyomi">趣味が合った</div>
+    <div class="chip" data-val="dokidoki">ドキドキした</div>
+    <div class="chip" data-val="itsumo">いつもありがとう</div>
+    <div class="chip" data-val="kimochi">気持ちよかった</div>
+    <div class="chip" data-val="raifu">また会いたい</div>
+  </div>
+
+  <div class="orei-label">📌 一緒にしたこと・話したこと（任意）</div>
+  <input class="orei-name" id="oreiPlay" type="text" placeholder="例）たくさん話した、ドライブした、責めてもらった…">
+
+  <div class="orei-label" style="margin-top:4px">🏷️ タグから追加</div>
+  <div class="tag-hints" id="oreiPlayHints">
+    <span class="tag-hint">💬 たくさん話した</span>
+    <span class="tag-hint">🚗 ドライブした</span>
+    <span class="tag-hint">🍽️ ごはん食べた</span>
+    <span class="tag-hint">🛒 買い物した</span>
+    <span class="tag-hint">😈 責めてもらった</span>
+    <span class="tag-hint">🔗 縛ってもらった</span>
+    <span class="tag-hint">👋 叩いてもらった</span>
+    <span class="tag-hint">⛓️ 拘束してもらった</span>
+    <span class="tag-hint">🙏 命令してもらった</span>
+    <span class="tag-hint">🖤 調教してもらった</span>
+    <span class="tag-hint">💆 マッサージした</span>
+    <span class="tag-hint">🥂 お酒飲んだ</span>
   </div>
 </div>
 
@@ -835,6 +897,48 @@ const DB = {
     ],
   },
 
+  // ---- お礼日記DB ----
+  orei: {
+    openings: {
+      natural: ['{name}さん、先日は会いに来てくれてありがとう', '{name}くん、来てくれて本当に嬉しかったよ', '{name}さん、この前はありがとうね'],
+      gyaru:   ['{name}さんありがとーございました！！', '{name}くん来てくれてまじ嬉しかった！！笑', '{name}さん、会えてほんとよかった！笑'],
+      ojosama: ['{name}様、先日はいらしてくださりありがとうございましたわ', '{name}様、ご来店いただき心より嬉しゅうございましたの'],
+      tenten:  ['{name}さん、来てくれてありがとー！', '{name}くん、先日はありがとうね〜！'],
+      cool:    ['{name}さん、先日はありがとう', '{name}くん、来てくれてよかった'],
+      ane:     ['{name}さん、先日はありがとうね', '{name}くん、会えて嬉しかったよ'],
+    },
+    impressions: {
+      yasashii:     { natural:'すごく優しくしてくれて、なんか胸があったかくなった', gyaru:'めちゃくちゃ優しくてびっくりした笑 感動したんだけど', ojosama:'とても優しくしてくださって、心がほっこりいたしましたわ', tenten:'すごく優しくしてくれて、なんかじーんってした〜', cool:'優しかった。そういう人、好きだな', ane:'優しくしてくれてさ、なんかすごく嬉しかったよ' },
+      hanashiyasui: { natural:'話しやすくて、あっという間に時間が過ぎちゃった', gyaru:'ノリがよくてめちゃくちゃ話しやすかった笑', ojosama:'お話がとても弾んで、時間が経つのも忘れてしまいましたの', tenten:'話しやすくてほわほわした〜楽しかった', cool:'話しやすかった。珍しく、たくさん話せた気がする', ane:'めちゃくちゃ話しやすくてさ、気づいたら時間経ってた笑' },
+      shinshi:      { natural:'紳士的にしてくれて、なんかじんときた', gyaru:'めちゃ紳士的でやばかった笑 ポイント高すぎる笑', ojosama:'紳士的なお振る舞いに、思わずうっとりしてしまいましたわ', tenten:'紳士的にしてくれてドキドキした〜！', cool:'紳士的だった。こういう人と会えてよかったと思う', ane:'紳士的にしてくれてさ、なんか久々そういう人に会えた笑' },
+      omoi:         { natural:'すごく気を使ってくれて、細かいところまで気にかけてくれた', gyaru:'気遣いがほんとやばかった笑 どこまで優しいの笑', ojosama:'こまやかなお気遣いに、とても感動いたしましたわ', tenten:'すごく気を使ってくれてうれしかった〜', cool:'気遣いができる人って、本当に少ない。ありがたかった', ane:'気遣いすごくてさ、こっちが恐縮したくらいだよ笑' },
+      tanoshii:     { natural:'とっても楽しかったな、またすぐ会いたいって思った', gyaru:'まじ楽しすぎて笑 時間足りなかった笑', ojosama:'とても楽しい時間を過ごさせていただきましたわ', tenten:'楽しかった〜！あっという間だった〜！', cool:'楽しかった、本当に。そう素直に言える', ane:'めちゃ楽しかったよ、また絶対来てほしいな' },
+      kakkoii:      { natural:'なんかかっこよくてドキドキしちゃった', gyaru:'かっこよすぎてきゅんってした笑 やばい笑', ojosama:'とてもステキな方で、思わずときめいてしまいましたわ', tenten:'かっこよくてドキドキした〜もう笑', cool:'かっこよかった。素直にそう思う', ane:'かっこよかったよ笑 ちゃんと言っとく笑' },
+      iroiro:       { natural:'いろいろしてもらって、なんか幸せな気持ちになった', gyaru:'いろいろしてくれてほんまありがとって感じ笑', ojosama:'いろいろとご配慮いただき、感謝の気持ちでいっぱいですわ', tenten:'いろいろしてくれてありがとー！うれしかった〜', cool:'いろいろしてもらった。そういうの、嬉しい', ane:'いろいろしてくれてさ、ほんとありがとうって感じ' },
+      kyomi:        { natural:'趣味とか話してたら共通点があって嬉しかった', gyaru:'趣味合いすぎてウケた笑 また話したい笑', ojosama:'趣味のお話が弾んで、とても楽しゅうございましたわ', tenten:'趣味が合ってなんか嬉しかった〜！また話したい', cool:'趣味が合う人って、貴重だな。嬉しかった', ane:'趣味の話で盛り上がれてよかった、また話しようね' },
+      dokidoki:     { natural:'なんかドキドキしっぱなしで、照れちゃった', gyaru:'ずっとドキドキしてたんだけど笑 なんか恥ずかしい笑', ojosama:'なんとも胸がときめく時間でしたわ、お恥ずかしながら', tenten:'ずっとドキドキしてた〜笑 なんかかわいいかも笑', cool:'ドキドキした。久々そういう感覚だった', ane:'ドキドキしてたの、正直に言うね笑' },
+      itsumo:       { natural:'いつも来てくれて本当にありがとう、いつも嬉しいよ', gyaru:'いつも来てくれてまじありがとです！！大好き笑', ojosama:'いつもいらしてくださって、心より感謝申し上げますわ', tenten:'いつも来てくれてありがとー！すごく嬉しいよ〜', cool:'いつも来てくれる。それだけで、ありがたいと思ってる', ane:'いつも来てくれてさ、ほんと嬉しいよ。ありがとう' },
+      kimochi:      { natural:'すごく気持ちよくて、幸せな時間だったな', gyaru:'めちゃ気持ちよかった笑 また味わいたい笑', ojosama:'とても満ち足りた、幸せな時間でしたわ', tenten:'すごく気持ちよかった〜！もっといたかった笑', cool:'気持ちよかった。正直に言う', ane:'すごくよかったよ、また来てね笑' },
+      raifu:        { natural:'また会いたいってすごく思ってる', gyaru:'また絶対会いたい！来てね！！笑', ojosama:'またお会いできる日を楽しみにしておりますわ', tenten:'また会いたいな〜！来てくれると嬉しい', cool:'また会いたい。それが本音', ane:'また来てほしい。ほんとそれだけ笑' },
+    },
+    play: {
+      natural: ['{play}、すごく良かったな', '{play}できて嬉しかったよ', '{play}はまたしたいな'],
+      gyaru:   ['{play}まじよかった！！笑', '{play}はヤバすぎた笑 また絶対やりたい'],
+      ojosama: ['{play}、とても素晴らしゅうございましたわ', '{play}はまたぜひお願いしたいですわ'],
+      tenten:  ['{play}楽しかった〜！また一緒にしたいな', '{play}ってすごくよかった〜'],
+      cool:    ['{play}、良かった。また一緒にしたい', '{play}できてよかった'],
+      ane:     ['{play}はよかったよ、また一緒にやろうね', '{play}ってやっぱいいよな笑'],
+    },
+    endings: {
+      natural: ['また会いに来てくれると嬉しいな♡', 'また来てくれるの待ってるね', '次もぜひ会おうね、待ってるよ'],
+      gyaru:   ['また絶対来てね！！待ってるから笑', '次もよろしくお願いします！！笑'],
+      ojosama: ['またいらしてくださることを心よりお待ち申し上げておりますわ', '次回もぜひよろしくお願いいたしますの'],
+      tenten:  ['また来てね〜！待ってるよ〜！', 'また会いに来てくれたら嬉しいな〜♡'],
+      cool:    ['また来てほしい。本当に', '次も、来てくれると嬉しい'],
+      ane:     ['また来てね、待ってるから', '次も絶対来いよ笑 待ってるからね'],
+    },
+  },
+
   // ---- 絵文字セット ----
   emojiSets: {
     natural: [['💕','✨','🌸','💗'],['🎀','💖','🌷','✨'],['💫','🌟','💝','🌸']],
@@ -851,6 +955,7 @@ const DB = {
 // ============================================================
 let state = {
   chara: 'natural',
+  mode: 'normal',
   mood: null,
   weather: null,
   season: null,
@@ -924,13 +1029,83 @@ document.getElementById('lengthSlider').addEventListener('input', function() {
 document.getElementById('generateBtn').addEventListener('click', generateAll);
 
 // ============================================================
+// モード切替
+// ============================================================
+const oreiImpressionSel = new Set();
+
+document.querySelectorAll('#modeToggle .mode-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#modeToggle .mode-btn').forEach(b => b.classList.remove('sel'));
+    btn.classList.add('sel');
+    state.mode = btn.dataset.mode;
+    const isOrei = state.mode === 'orei';
+    document.querySelectorAll('.normal-only').forEach(el => el.classList.toggle('hidden', isOrei));
+    document.getElementById('oreiCard').classList.toggle('hidden', !isOrei);
+    document.getElementById('generateBtn').textContent = isOrei ? '💌 お礼日記を生成する 💌' : '✨ 日記を生成する ✨';
+  });
+});
+
+document.querySelectorAll('#oreiImpression .chip').forEach(el => {
+  el.addEventListener('click', () => {
+    const v = el.dataset.val;
+    if (oreiImpressionSel.has(v)) { oreiImpressionSel.delete(v); el.classList.remove('sel'); }
+    else { oreiImpressionSel.add(v); el.classList.add('sel'); }
+  });
+});
+
+document.querySelectorAll('#oreiPlayHints .tag-hint').forEach(tag => {
+  tag.addEventListener('click', () => {
+    const ta = document.getElementById('oreiPlay');
+    const text = tag.textContent.replace(/^\S{1,2}\s?/, '').trim();
+    ta.value += (ta.value && !ta.value.match(/[、，,]$/) ? '、' : '') + text;
+  });
+});
+
+// ============================================================
+// お礼日記生成
+// ============================================================
+function generateOrei() {
+  const ch = state.chara;
+  const name = document.getElementById('oreiName').value.trim() || 'あなた';
+  const play = document.getElementById('oreiPlay').value.trim();
+  const length = parseInt(document.getElementById('lengthSlider').value);
+  const emojis = pick(DB.emojiSets[ch]);
+  const [e1, e2, e3, e4] = emojis;
+  const parts = [];
+
+  // 1. 書き出し（お名前入り）
+  parts.push(pick(DB.orei.openings[ch]).replace('{name}', name) + e1);
+
+  // 2. 印象フレーズ（選択されたもの最大2個）
+  const selKeys = [...oreiImpressionSel];
+  const picks = selKeys.sort(() => Math.random()-0.5).slice(0, length >= 2 ? 2 : 1);
+  if (picks.length > 0) {
+    picks.forEach((k, i) => {
+      const phrase = DB.orei.impressions[k][ch];
+      parts.push(phrase + (i === 0 ? e2 : e3));
+    });
+  }
+
+  // 3. 一緒にしたこと
+  if (play) {
+    parts.push(pick(DB.orei.play[ch]).replace('{play}', play) + e2);
+  }
+
+  // 4. 締め
+  parts.push(e4 + pick(DB.orei.endings[ch]));
+
+  return parts.join('\n\n');
+}
+
+// ============================================================
 // 生成
 // ============================================================
 function generateAll() {
   const wrap = document.getElementById('resultsWrap');
   wrap.innerHTML = '';
+  const isOrei = state.mode === 'orei';
   for (let i = 0; i < state.count; i++) {
-    const text = generateOne();
+    const text = isOrei ? generateOrei() : generateOne();
     wrap.appendChild(makeResultItem(i + 1, text));
   }
   wrap.classList.add('vis');
