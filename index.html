@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
@@ -288,6 +288,12 @@
 <div class="card">
   <div class="sec-title">💕 今の気分</div>
   <div class="chips" id="moodGroup">
+    <div class="chip" data-val="semeraretai" style="border-color:#c060a0;color:#a0407a;">🖤 責められたい</div>
+    <div class="chip" data-val="tatakaretai" style="border-color:#c060a0;color:#a0407a;">👋 叩かれたい</div>
+    <div class="chip" data-val="kousoku" style="border-color:#c060a0;color:#a0407a;">⛓️ 拘束されたい</div>
+    <div class="chip" data-val="shibararetai" style="border-color:#c060a0;color:#a0407a;">🔗 縛られたい</div>
+    <div class="chip" data-val="choukyou" style="border-color:#c060a0;color:#a0407a;">😈 調教されたい</div>
+    <div class="chip" data-val="shihai" style="border-color:#c060a0;color:#a0407a;">🙏 支配されたい</div>
     <div class="chip" data-val="happy">嬉しい</div>
     <div class="chip" data-val="fuwafuwa">ふわふわ</div>
     <div class="chip" data-val="tension">テンション高め</div>
@@ -330,7 +336,27 @@
 <!-- 話題 -->
 <div class="card">
   <div class="sec-title">📌 話題・出来事</div>
-  <textarea id="topicInput" rows="3" placeholder="例）カフェでランチした、ネイルを変えた、映画を見た…"></textarea>
+  <textarea id="topicInput" rows="3" placeholder="例）責められた、縛られた、カフェでランチ、ネイルを変えた…"></textarea>
+  <!-- SMタグ（先頭） -->
+  <div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px dashed #f0d0e8;">
+    <div style="font-size:0.72rem;color:#c75fa0;font-weight:bold;margin-bottom:6px;">🖤 SMワード</div>
+    <div class="tag-hints" id="smTagHints">
+      <span class="tag-hint">🖤 ドM</span>
+      <span class="tag-hint">😈 責められた</span>
+      <span class="tag-hint">👋 叩かれた</span>
+      <span class="tag-hint">🔗 縛られた</span>
+      <span class="tag-hint">⛓️ 拘束された</span>
+      <span class="tag-hint">🙏 命令された</span>
+      <span class="tag-hint">👠 踏まれた</span>
+      <span class="tag-hint">🕯️ 蝋燭プレイ</span>
+      <span class="tag-hint">👁️ 目隠し</span>
+      <span class="tag-hint">🤐 口枷</span>
+      <span class="tag-hint">💢 鞭</span>
+      <span class="tag-hint">🍑 お尻叩き</span>
+      <span class="tag-hint">😳 羞恥プレイ</span>
+      <span class="tag-hint">🔒 拘束プレイ</span>
+    </div>
+  </div>
   <div class="tag-hints" id="tagHints">
     <span class="tag-hint">🍰 スイーツ</span>
     <span class="tag-hint">💅 ネイル</span>
@@ -350,26 +376,6 @@
     <span class="tag-hint">💆 マッサージ</span>
     <span class="tag-hint">🎤 カラオケ</span>
     <span class="tag-hint">🌙 夜更かし</span>
-  </div>
-  <!-- SMタグ -->
-  <div style="margin-top:10px;padding-top:10px;border-top:1px dashed #f0d0e8;">
-    <div style="font-size:0.72rem;color:#c75fa0;font-weight:bold;margin-bottom:6px;">🖤 SMワード</div>
-    <div class="tag-hints" id="smTagHints">
-      <span class="tag-hint">🖤 ドM</span>
-      <span class="tag-hint">🔗 縛り</span>
-      <span class="tag-hint">👋 叩かれたい</span>
-      <span class="tag-hint">⛓️ 拘束</span>
-      <span class="tag-hint">🍑 お尻</span>
-      <span class="tag-hint">😈 責められたい</span>
-      <span class="tag-hint">🕯️ 蝋燭</span>
-      <span class="tag-hint">👁️ 目隠し</span>
-      <span class="tag-hint">🤐 口枷</span>
-      <span class="tag-hint">💢 鞭</span>
-      <span class="tag-hint">🙏 命令されたい</span>
-      <span class="tag-hint">😳 羞恥</span>
-      <span class="tag-hint">🔒 拘束プレイ</span>
-      <span class="tag-hint">👠 踏まれたい</span>
-    </div>
   </div>
 </div>
 
@@ -419,6 +425,12 @@ const DB = {
   // ---- 書き出し ----
   openings: {
     natural: {
+      semeraretai: ['なんか今日は責められたい気分でずっとそわそわしてた', '責められたい気持ちが頭から離れなくて、ずっともやもやしてた'],
+      tatakaretai: ['叩かれたいってずっと思いながら過ごした一日だった', 'なんか叩かれたい気分がじわじわ込み上げてきた'],
+      kousoku:     ['拘束されたくてたまらない気持ちになった一日', '縛り付けられたいってそわそわが止まらなかった'],
+      shibararetai:['縛られたい気持ちがずっとあって、もう頭から離れなかった', '縛られたいってずっと考えてた一日'],
+      choukyou:    ['調教されたいってそわそわする一日だった', '誰かに調教してもらいたいって気持ちが溢れてきた'],
+      shihai:      ['支配されたいって気持ちが強くて、全部委ねたいってなってた', '誰かに全部任せたい、支配されたいって一日中思ってた'],
       happy:    ['今日はなんかすごく嬉しい一日だったよ', '朝から気分がよくて、それだけでいい日になった'],
       fuwafuwa: ['なんかふわふわした気分が続いてる', 'ほわほわした気持ちで一日過ごしてた'],
       tension:  ['今日はめちゃくちゃテンション高くて！', '朝から謎にアドレナリン出てる笑'],
@@ -433,6 +445,12 @@ const DB = {
       curious:  ['今日はいろんなことが気になって仕方なかった！', '好奇心のまま動いた一日だったな'],
     },
     gyaru: {
+      semeraretai: ['ていうかもー責められたくてしょうがないんだけど！！', '責められたい欲が爆発しそうな一日だったんだけど笑'],
+      tatakaretai: ['叩かれたくてたまらん一日だったんだけど笑', 'なんか叩かれたいってずっと思ってた笑'],
+      kousoku:     ['拘束されたくてヤバすぎる！もうそれしか考えられなかった笑', '縛られたい欲が止まらん日だった笑'],
+      shibararetai:['縛られたいってずっとあったんだけど笑 やばくない？', '縛られたい気持ちがマックスな一日だった笑'],
+      choukyou:    ['調教されたいって気持ちがヤバすぎて笑 そわそわしてた', '調教してほしくてたまらん一日だったんだけど！'],
+      shihai:      ['全部支配されたいってなってる日だった笑 やばくない？', '誰かに支配されたい欲が爆発した一日笑'],
       happy:    ['今日やばい、めっちゃ嬉しいことあったんだけど！！', 'きょーはほんとサイコーな一日だったんだけど笑'],
       fuwafuwa: ['なんかきょーふわっふわした気分なんですけど〜', 'ふわ〜ってなる感じずっと続いてる笑'],
       tension:  ['きょーのテンションやばくない！？笑', 'ちょーハイになってる日なんだけどww'],
@@ -447,6 +465,12 @@ const DB = {
       curious:  ['きょーはいろんなことが気になりすぎてやばかった！', '好奇心旺盛すぎる一日だったww'],
     },
     ojosama: {
+      semeraretai: ['本日はどうしても責められたい気持ちが溢れてしまいましたの', '責められたいという気持ちがふつふつと込み上げてきた一日でしてよ'],
+      tatakaretai: ['叩かれたいという欲求がどうにも収まらない一日でしたわ', '叩かれたい気持ちがじわりと込み上げてきましたの'],
+      kousoku:     ['拘束されたいというお気持ちが溢れてなりませんでした', '縛り付けられたいと思ってしまう一日でしてよ'],
+      shibararetai:['縛られたいというお気持ちが終日頭を離れませんでしたの', '縛られたい気持ちを抱えたまま過ごした一日でしたわ'],
+      choukyou:    ['調教されたいという気持ちが溢れてしまいましたの', 'どうしても調教されたくて仕方ない一日でしてよ'],
+      shihai:      ['全て委ねて支配されたいという気持ちが溢れた一日でしたわ', '支配されたいという気持ちがどうにも抑えられませんでしたの'],
       happy:    ['本日はとても嬉しいことがございました', '朝からお心が浮き立つような一日でしてよ'],
       fuwafuwa: ['なんとなくふわふわとした心地で過ごしておりました', '夢の中にいるような一日でしたわ'],
       tension:  ['本日はいつにも増して活力があふれておりましたの', '気持ちが上向きで、とても充実した一日でしてよ'],
@@ -461,6 +485,12 @@ const DB = {
       curious:  ['本日はいろいろなことに興味が湧いて仕方ありませんでしたわ', '好奇心がくすぐられる一日でしてよ'],
     },
     tenten: {
+      semeraretai: ['責められたいってそわそわしてた一日だったよ〜笑', 'なんか責められたい気持ちがずっとあってドキドキしてた〜'],
+      tatakaretai: ['叩かれたいってなってた〜笑 なんかそういう気分だった', '叩かれたいってずっと思いながら過ごしてた〜'],
+      kousoku:     ['拘束されたくてそわそわしてた〜笑 なんかドキドキ', '縛られたいって気持ちがあった一日だったよ〜'],
+      shibararetai:['縛られたいってずっと頭にあった〜なんでだろ笑', 'なんか縛られたいって気持ちがじわじわしてた〜'],
+      choukyou:    ['調教されたいってそわそわしてた〜笑', '調教してほしいって気持ちがじわじわきてた〜'],
+      shihai:      ['全部支配されたいってなってた〜笑 委ねたい感じ', '支配されたい気持ちがあった一日だったよ〜'],
       happy:    ['きょーなんか嬉しいことがあった気がする〜！', 'ほわほわ〜って幸せな気分の一日だったよ〜'],
       fuwafuwa: ['なんかずーっとふわふわしてた〜笑', 'ふわっとした気持ちが続いてた〜'],
       tension:  ['なんか今日テンション高かった〜！なんでかわからないけど笑', 'ふしぎとテンションが高い一日だったよ〜'],
@@ -475,6 +505,12 @@ const DB = {
       curious:  ['きょーはいろんなことが気になって気になって！', 'なんかいろんなことを調べてた〜笑'],
     },
     cool: {
+      semeraretai: ['責められたい気持ちが静かにある。そういう日', '責められたい。ただそれだけの一日だった'],
+      tatakaretai: ['叩かれたいという気持ちが今日は強かった', '叩かれたくてじっとしていられない感覚だった'],
+      kousoku:     ['拘束されたい。それだけを考えてた', '縛り付けられたい気持ちが、ずっとそこにあった'],
+      shibararetai:['縛られたいという感覚が消えない一日だった', '縛られたい。静かにそう思っていた'],
+      choukyou:    ['調教されたい気持ちが今日はある、正直に言うと', '調教されたい。それが今日の正直なところ'],
+      shihai:      ['支配されたい。全て委ねてしまいたい、そういう日', '誰かに支配されたい気持ちが今日は強かった'],
       happy:    ['今日はちょっと嬉しいことがあった', '珍しくテンションが上がった一日'],
       fuwafuwa: ['なんとなくふわっとした気分が続いてた', '不思議と穏やかな気持ちでいられた一日'],
       tension:  ['今日は珍しくテンション高めだった', '気分がよくて、いつもより動けた一日'],
@@ -489,6 +525,12 @@ const DB = {
       curious:  ['今日はいろいろ気になることがあって、調べてた', '好奇心が動いた一日。それはそれで楽しい'],
     },
     ane: {
+      semeraretai: ['責められたいって気持ちがある、今日は正直そう', '責められたい気分がずっとあった、なんかそういう日'],
+      tatakaretai: ['叩かれたくてしょうがない、そういう一日だった', '叩かれたいって思いながら過ごしてた笑'],
+      kousoku:     ['拘束されたいってそわそわしてた。そういう日もある', '縛られたい気持ちが強かった今日、正直に言うと'],
+      shibararetai:['縛られたいってずっと思ってた、なんかそういう気分の一日', '縛られたい。今日はそれがすごく強かった'],
+      choukyou:    ['調教されたいって気持ちが今日は強くてさ', '調教してほしい。そういう日ってたまにある'],
+      shihai:      ['支配されたい、全部委ねたい。そういう気分の一日だった', '今日は誰かに支配されたい気持ちが止まらなかった笑'],
       happy:    ['今日はさ、なかなかいい一日だったんだよね', 'ちょっと嬉しいことがあってさ、いい気分'],
       fuwafuwa: ['なんかふわっとした気分が続いてる、不思議と', 'ほんわかした気持ちで過ごした一日'],
       tension:  ['今日はなんかスイッチ入ってたわ！', '珍しくテンション高かった笑 気分よかった'],
